@@ -1,0 +1,1289 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DSE 學習神器 - Duo貓頭鷹監督版</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft JhengHei', 'PingFang TC', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        h1 {
+            color: #667eea;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+
+        .duo-mascot {
+            text-align: center;
+            font-size: 4em;
+            margin-bottom: 20px;
+        }
+
+        .motivation {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            flex: 1;
+            min-width: 120px;
+            padding: 15px;
+            background: #f0f0f0;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            transform: scale(1.05);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .subject-selector {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .subject-btn {
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .subject-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+
+        .quiz-builder {
+            background: #f9f9f9;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        input[type="text"], textarea, select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: border 0.3s;
+        }
+
+        input[type="text"]:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .options-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .option-input {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .option-input input {
+            flex: 1;
+        }
+
+        .image-upload {
+            margin-top: 10px;
+        }
+
+        .image-preview {
+            max-width: 200px;
+            max-height: 200px;
+            margin-top: 10px;
+            border-radius: 8px;
+        }
+
+        button {
+            padding: 12px 25px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+        }
+
+        .quiz-list {
+            display: grid;
+            gap: 15px;
+        }
+
+        .quiz-card {
+            background: white;
+            border: 2px solid #ddd;
+            border-radius: 12px;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s;
+        }
+
+        .quiz-card:hover {
+            border-color: #667eea;
+            transform: translateX(5px);
+        }
+
+        .quiz-info h3 {
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+
+        .quiz-meta {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .quiz-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .quiz-mode {
+            text-align: center;
+        }
+
+        .question-card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 20px;
+            border: 3px solid #667eea;
+        }
+
+        .question-number {
+            color: #667eea;
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .question-text {
+            font-size: 1.3em;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .question-image {
+            max-width: 100%;
+            max-height: 300px;
+            margin-bottom: 20px;
+            border-radius: 10px;
+        }
+
+        .choices {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .choice-btn {
+            padding: 15px 20px;
+            background: #f0f0f0;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1.1em;
+            text-align: left;
+            transition: all 0.3s;
+        }
+
+        .choice-btn:hover {
+            background: #e8e8e8;
+            border-color: #667eea;
+        }
+
+        .choice-btn.correct {
+            background: #d4edda;
+            border-color: #28a745;
+        }
+
+        .choice-btn.wrong {
+            background: #f8d7da;
+            border-color: #dc3545;
+        }
+
+        .long-answer {
+            width: 100%;
+            min-height: 150px;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 1.1em;
+            margin-bottom: 15px;
+        }
+
+        .score-board {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+        }
+
+        .score-item {
+            text-align: center;
+        }
+
+        .score-label {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        .score-value {
+            font-size: 2em;
+            font-weight: bold;
+        }
+
+        .feedback {
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            font-size: 1.2em;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .feedback.correct {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .feedback.wrong {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .flashcard {
+            background: white;
+            border-radius: 20px;
+            padding: 50px;
+            min-height: 300px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.5s;
+            border: 3px solid #667eea;
+            position: relative;
+        }
+
+        .flashcard.flipped {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .flashcard-content {
+            font-size: 1.5em;
+            text-align: center;
+            line-height: 1.6;
+        }
+
+        .flashcard-hint {
+            position: absolute;
+            bottom: 20px;
+            font-size: 0.9em;
+            opacity: 0.7;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 30px;
+            background: #f0f0f0;
+            border-radius: 15px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.5s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .results {
+            text-align: center;
+            padding: 40px;
+        }
+
+        .results h2 {
+            font-size: 2.5em;
+            color: #667eea;
+            margin-bottom: 20px;
+        }
+
+        .final-score {
+            font-size: 4em;
+            font-weight: bold;
+            color: #764ba2;
+            margin-bottom: 20px;
+        }
+
+        .roast {
+            font-size: 1.3em;
+            color: #666;
+            margin-bottom: 30px;
+            font-style: italic;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        .shake {
+            animation: shake 0.5s;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .bounce {
+            animation: bounce 0.5s;
+        }
+
+        .hide {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="duo-mascot">🦉</div>
+        <h1>DSE 學習神器</h1>
+        <div class="motivation" id="motivation">67日倒數，唔好玩啦，快啲溫書！💀</div>
+
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('manage')">管理題庫</button>
+            <button class="tab-btn" onclick="switchTab('quiz')">做測驗</button>
+            <button class="tab-btn" onclick="switchTab('flashcard')">Flashcard</button>
+            <button class="tab-btn" onclick="switchTab('stats')">錯題回顧</button>
+        </div>
+
+        <!-- 管理題庫 -->
+        <div id="manage-tab" class="tab-content active">
+            <div class="subject-selector" id="subject-selector">
+                <button class="subject-btn" onclick="selectSubject('Econ')">📊 經濟 Econ</button>
+                <button class="subject-btn" onclick="selectSubject('Eng')">🇬🇧 英文 English</button>
+                <button class="subject-btn" onclick="selectSubject('中史')">📜 中史</button>
+                <button class="subject-btn" onclick="selectSubject('中文')">✍️ 中文</button>
+                <button class="subject-btn" onclick="selectSubject('M2')">🔢 M2</button>
+            </div>
+            
+            <div style="margin-top: 20px; text-align: center;">
+                <div style="background: #f9f9f9; padding: 20px; border-radius: 15px; display: inline-block; max-width: 500px;">
+                    <h3 style="margin-bottom: 15px; color: #667eea;">✨ 自訂科目/Topic</h3>
+                    <p style="margin-bottom: 15px; color: #666; font-size: 0.9em;">
+                        例如：Econ - Market Structure、中史 - 辛亥革命、M2 - Integration
+                    </p>
+                    <input type="text" id="custom-subject" placeholder="輸入科目名稱（可以加topic）" 
+                           style="width: 100%; margin-bottom: 10px;">
+                    <button onclick="selectCustomSubject()">➕ 開始加題目</button>
+                </div>
+            </div>
+
+            <div id="quiz-builder" class="quiz-builder hide">
+                <h2>新增題目 - <span id="current-subject"></span></h2>
+                
+                <div class="form-group">
+                    <label>題目類型</label>
+                    <select id="question-type" onchange="toggleQuestionType()">
+                        <option value="mc">Multiple Choice</option>
+                        <option value="long">Long Question</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>題目</label>
+                    <textarea id="question-text" placeholder="輸入題目..."></textarea>
+                    <div class="image-upload">
+                        <label>上傳圖片（可選）</label>
+                        <input type="file" id="question-image" accept="image/*" onchange="previewImage(this, 'question-preview')">
+                        <img id="question-preview" class="image-preview hide">
+                    </div>
+                </div>
+
+                <div id="mc-section">
+                    <div class="form-group">
+                        <label>選項（每行一個，正確答案用 * 開頭）</label>
+                        <textarea id="options-text" placeholder="例如：&#10;* 正確答案&#10;錯誤選項1&#10;錯誤選項2&#10;錯誤選項3"></textarea>
+                    </div>
+                </div>
+
+                <div id="long-section" class="hide">
+                    <div class="form-group">
+                        <label>參考答案</label>
+                        <textarea id="answer-text" placeholder="輸入參考答案..."></textarea>
+                    </div>
+                </div>
+
+                <button onclick="addQuestion()">➕ 加題目</button>
+                <button class="btn-secondary" onclick="cancelAdd()">取消</button>
+            </div>
+
+            <div id="quiz-list" class="quiz-list"></div>
+        </div>
+
+        <!-- 做測驗 -->
+        <div id="quiz-tab" class="tab-content">
+            <div id="quiz-select">
+                <h2>選擇科目開始測驗</h2>
+                <div class="subject-selector" id="quiz-subject-selector"></div>
+            </div>
+
+            <div id="quiz-mode" class="quiz-mode hide">
+                <div class="score-board">
+                    <div class="score-item">
+                        <div class="score-label">分數</div>
+                        <div class="score-value" id="score">0</div>
+                    </div>
+                    <div class="score-item">
+                        <div class="score-label">連續答啱</div>
+                        <div class="score-value" id="streak">0</div>
+                    </div>
+                    <div class="score-item">
+                        <div class="score-label">進度</div>
+                        <div class="score-value" id="progress-text">0/0</div>
+                    </div>
+                </div>
+
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progress-bar" style="width: 0%">0%</div>
+                </div>
+
+                <div id="question-container"></div>
+                <div id="feedback-container"></div>
+
+                <div id="quiz-actions" style="text-align: center; margin-top: 20px;">
+                    <button onclick="nextQuestion()">下一題 ➡️</button>
+                    <button class="btn-danger" onclick="quitQuiz()">退出測驗</button>
+                </div>
+
+                <div id="results" class="results hide"></div>
+            </div>
+        </div>
+
+        <!-- Flashcard -->
+        <div id="flashcard-tab" class="tab-content">
+            <div id="flashcard-select">
+                <h2>選擇科目開始Flashcard</h2>
+                <div class="subject-selector" id="flashcard-subject-selector"></div>
+            </div>
+
+            <div id="flashcard-mode" class="hide">
+                <div class="score-board">
+                    <div class="score-item">
+                        <div class="score-label">已溫</div>
+                        <div class="score-value" id="flashcard-progress">0/0</div>
+                    </div>
+                </div>
+
+                <div class="flashcard" id="flashcard" onclick="flipCard()">
+                    <div class="flashcard-content" id="flashcard-content"></div>
+                    <div class="flashcard-hint">點擊翻卡 / 按 Space</div>
+                </div>
+
+                <div style="text-align: center; margin-top: 20px;">
+                    <button onclick="nextFlashcard()">下一張 ➡️</button>
+                    <button class="btn-danger" onclick="quitFlashcard()">退出</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 錯題回顧 -->
+        <div id="stats-tab" class="tab-content">
+            <h2>錯題回顧</h2>
+            <div id="wrong-questions-list"></div>
+        </div>
+    </div>
+
+    <script>
+        // Sound Effects
+        const correctSound = () => {
+            const audio = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBSuBzvLZiTYIGWi77eafTRAMUKfj8LZjHAY4ktjyzHksBSh+zPLaizsKGGS57OihUBELTKXh8bllHgU2jdXxz3kpBSh+zPLaizsKGGS57OihUBELTKXh8bllHgU2jdXxz3kpBSh+zPLaizsKGGS57OihUBELTKXh8bllHgU2jdXxz3kpBSh+zPLaizsKGGS57OihUBELTKXh8bllHgU2jdXxz3kpBSR6y/HcizsLGGS47OahURALTKXi8LdlHwU2jdX0zocsBSh+zPLaizsKGGS57OihUBELTKXh8bllHgU2jdXxz3kpBSh+zPLaizsKGGS57OihUBELTKXh8bllHgU2jdXxz3kpBSh+zPLaizsKGGS57OihUBELTKXh8bllHgU2jdXxz3kpBSh+zPLaizsKGGS57OihUBELTKXh8bllHgU2jdXxz3kpBSh+zPLaizsKGGS57OihUBELTKXh8bllHgU2jdXxz3kpBSh+zPLaizsKGGS57OihUBELTKXh8bllHgU2jdXxz3kpBSh+zPLaizsKGGS57OihUBELTKXh8bllHgU2jdXxz3kpBSh+zPLaizsKGGS57OihUBELTKXh8bllHgU2jdXxz3kpBSh+zPLaizsKGGS57OihUBELTKXh8bllHgU2jdXxz3kpBSh+zPLaizsKGGS57OihUBELTKXh8bllHgU2jdXxz3kpBSh+zPLaizsKGGS57OihUBELTKXh8bllHgU2jdXxz3kpBSh+zPLaizsKGGS57OihUBELTKXh8bllHgU2jdXxz3kpBSh+zPLaizsKGGS57OihUBELTKXh8bllHgU2jdXxz3kpBSh+zPLaizsKGGS57OihUBELTKXh8bllHgU2jdXxz3kpBSh+zPLaizsKGGS57OihUBELTKXh8bllHgU2jdXxz3kpBSh+zPLaizsKGGS57OihUBELTKXh8bllHgU2jdXxz3kpBSh+zPLaizsKGGS57OihUBELTKXh8bllHgU=');
+            audio.play().catch(e => console.log('Sound play failed'));
+        };
+
+        const wrongSound = () => {
+            const audio = new Audio('data:audio/wav;base64,UklGRmQEAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YUAEAAD/////AgD+/wAA/f8CAAAA/v8BAAAA//8AAAAAAAD//wEAAAD+/wAA//8AAP7/AQAAAP//AAD//wAA//8AAP//AAD//wAA//8AAP//AAD//wAA//8AAP//AAD//wAA//8AAP//AAD//wAA//8AAP//AAD//wAA//8AAP//AAD//wAA//8AAP//AAD//wAA//8AAP//AAD//wAA//8AAP//AAD//wAA//8AAP//AAD//wAA//8AAP//AAD//wAA//8AAP//AAD//wAA//8AAP//AAD//wAA//8AAP//AAD//wAA//8AAP//AAD//wAA//8AAP//AAD//wAA//8AAP//AAD//wAA//8AAP//AAD//wAA//8AAP//AAD//wAA//8AAP//AAD//wAA//8AAP//AAD//wAA//8AAP//AAD//wAA//8AAP//AAD//wAA//8AAP//AAD//wAA');
+            audio.play().catch(e => console.log('Sound play failed'));
+        };
+
+        const flipSound = () => {
+            const audio = new Audio('data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=');
+            audio.play().catch(e => console.log('Sound play failed'));
+        };
+
+        // Data Structure
+        let quizData = JSON.parse(localStorage.getItem('quizData')) || {};
+        let wrongQuestions = JSON.parse(localStorage.getItem('wrongQuestions')) || {};
+        let currentSubject = '';
+        let currentQuiz = [];
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let streak = 0;
+        let isAnswered = false;
+
+        // Initialize
+        function init() {
+            loadQuizList();
+            updateMotivation();
+            setInterval(updateMotivation, 10000);
+        }
+
+        function updateMotivation() {
+            const daysLeft = Math.ceil((new Date('2025-05-04') - new Date()) / (1000 * 60 * 60 * 24));
+            const roasts = [
+                `仲有${daysLeft}日DSE，你做緊乜？💀`,
+                `${daysLeft}日後就考試啦，快啲溫書！🦉`,
+                `停，唔好再拖啦！仲有${daysLeft}日！⚠️`,
+                `你以為自己好勁？${daysLeft}日後見真章！💪`,
+                `${daysLeft}日倒數，唔好玩啦！📚`
+            ];
+            document.getElementById('motivation').textContent = roasts[Math.floor(Math.random() * roasts.length)];
+        }
+
+        // Tab Switching
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            event.target.classList.add('active');
+            document.getElementById(`${tab}-tab`).classList.add('active');
+
+            if (tab === 'quiz') {
+                loadQuizSubjects();
+            } else if (tab === 'flashcard') {
+                loadFlashcardSubjects();
+            } else if (tab === 'stats') {
+                loadWrongQuestions();
+            }
+        }
+
+        // Subject Selection
+        function selectSubject(subject) {
+            currentSubject = subject;
+            document.getElementById('current-subject').textContent = subject;
+            document.getElementById('subject-selector').classList.add('hide');
+            document.getElementById('quiz-builder').classList.remove('hide');
+            loadQuizList();
+        }
+
+        function selectCustomSubject() {
+            const customInput = document.getElementById('custom-subject').value.trim();
+            if (!customInput) {
+                alert('請輸入科目名稱！');
+                return;
+            }
+            selectSubject(customInput);
+            document.getElementById('custom-subject').value = '';
+        }
+
+        function cancelAdd() {
+            document.getElementById('quiz-builder').classList.add('hide');
+            document.getElementById('subject-selector').classList.remove('hide');
+            clearForm();
+        }
+
+        function toggleQuestionType() {
+            const type = document.getElementById('question-type').value;
+            if (type === 'mc') {
+                document.getElementById('mc-section').classList.remove('hide');
+                document.getElementById('long-section').classList.add('hide');
+            } else {
+                document.getElementById('mc-section').classList.add('hide');
+                document.getElementById('long-section').classList.remove('hide');
+            }
+        }
+
+        function previewImage(input, previewId) {
+            const preview = document.getElementById(previewId);
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    preview.src = e.target.result;
+                    preview.classList.remove('hide');
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        // Add Question
+        function addQuestion() {
+            const type = document.getElementById('question-type').value;
+            const questionText = document.getElementById('question-text').value.trim();
+            const questionImage = document.getElementById('question-preview').src;
+
+            if (!questionText) {
+                alert('請輸入題目！');
+                return;
+            }
+
+            const question = {
+                id: Date.now(),
+                type: type,
+                question: questionText,
+                image: questionImage !== location.href ? questionImage : null,
+                wrongCount: 0
+            };
+
+            if (type === 'mc') {
+                const optionsText = document.getElementById('options-text').value.trim();
+                if (!optionsText) {
+                    alert('請輸入選項！');
+                    return;
+                }
+
+                const lines = optionsText.split('\n').filter(line => line.trim());
+                const options = [];
+                let correctAnswer = -1;
+
+                lines.forEach((line, index) => {
+                    if (line.startsWith('*')) {
+                        correctAnswer = index;
+                        options.push(line.substring(1).trim());
+                    } else {
+                        options.push(line.trim());
+                    }
+                });
+
+                if (correctAnswer === -1) {
+                    alert('請用 * 標記正確答案！');
+                    return;
+                }
+
+                question.options = options;
+                question.correctAnswer = correctAnswer;
+            } else {
+                const answerText = document.getElementById('answer-text').value.trim();
+                if (!answerText) {
+                    alert('請輸入參考答案！');
+                    return;
+                }
+                question.answer = answerText;
+            }
+
+            if (!quizData[currentSubject]) {
+                quizData[currentSubject] = [];
+            }
+            quizData[currentSubject].push(question);
+            
+            localStorage.setItem('quizData', JSON.stringify(quizData));
+            
+            clearForm();
+            loadQuizList();
+            
+            alert('✅ 加咗題目！繼續努力！');
+        }
+
+        function clearForm() {
+            document.getElementById('question-text').value = '';
+            document.getElementById('options-text').value = '';
+            document.getElementById('answer-text').value = '';
+            document.getElementById('question-preview').classList.add('hide');
+            document.getElementById('question-preview').src = '';
+        }
+
+        function loadQuizList() {
+            const container = document.getElementById('quiz-list');
+            container.innerHTML = '';
+
+            Object.keys(quizData).forEach(subject => {
+                const questions = quizData[subject];
+                if (questions.length === 0) return;
+
+                const card = document.createElement('div');
+                card.className = 'quiz-card';
+                card.innerHTML = `
+                    <div class="quiz-info">
+                        <h3>${subject}</h3>
+                        <div class="quiz-meta">${questions.length} 條題目</div>
+                    </div>
+                    <div class="quiz-actions">
+                        <button onclick="viewQuestions('${subject}')">查看題目</button>
+                        <button class="btn-danger" onclick="deleteSubject('${subject}')">刪除</button>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+
+            if (container.innerHTML === '') {
+                container.innerHTML = '<p style="text-align: center; color: #666;">未有題目，快啲加題目！</p>';
+            }
+        }
+
+        function viewQuestions(subject) {
+            const questions = quizData[subject];
+            let html = `<h3>${subject} 題目列表</h3>`;
+            
+            questions.forEach((q, index) => {
+                html += `
+                    <div class="quiz-card">
+                        <div class="quiz-info">
+                            <div><strong>Q${index + 1}:</strong> ${q.question.substring(0, 50)}${q.question.length > 50 ? '...' : ''}</div>
+                            <div class="quiz-meta">${q.type === 'mc' ? 'Multiple Choice' : 'Long Question'} | 錯${q.wrongCount}次</div>
+                        </div>
+                        <div class="quiz-actions">
+                            <button class="btn-danger" onclick="deleteQuestion('${subject}', ${index})">刪除</button>
+                        </div>
+                    </div>
+                `;
+            });
+
+            const modal = confirm(html + '\n\n按確定返回');
+            if (modal) {
+                loadQuizList();
+            }
+        }
+
+        function deleteQuestion(subject, index) {
+            if (confirm('確定要刪除呢條題目？')) {
+                quizData[subject].splice(index, 1);
+                if (quizData[subject].length === 0) {
+                    delete quizData[subject];
+                }
+                localStorage.setItem('quizData', JSON.stringify(quizData));
+                loadQuizList();
+            }
+        }
+
+        function deleteSubject(subject) {
+            if (confirm(`確定要刪除${subject}所有題目？`)) {
+                delete quizData[subject];
+                localStorage.setItem('quizData', JSON.stringify(quizData));
+                loadQuizList();
+            }
+        }
+
+        // Quiz Mode
+        function loadQuizSubjects() {
+            const container = document.getElementById('quiz-subject-selector');
+            container.innerHTML = '';
+
+            Object.keys(quizData).forEach(subject => {
+                if (quizData[subject].length > 0) {
+                    const btn = document.createElement('button');
+                    btn.className = 'subject-btn';
+                    btn.textContent = `${subject} (${quizData[subject].length}題)`;
+                    btn.onclick = () => startQuiz(subject);
+                    container.appendChild(btn);
+                }
+            });
+        }
+
+        function startQuiz(subject) {
+            currentSubject = subject;
+            currentQuiz = [...quizData[subject]];
+            
+            // Add wrong questions for this subject
+            if (wrongQuestions[subject]) {
+                wrongQuestions[subject].forEach(wq => {
+                    if (wq.wrongCount < 3) {
+                        currentQuiz.push(wq);
+                    }
+                });
+            }
+
+            // Shuffle
+            currentQuiz.sort(() => Math.random() - 0.5);
+            
+            currentQuestionIndex = 0;
+            score = 0;
+            streak = 0;
+            
+            document.getElementById('quiz-select').classList.add('hide');
+            document.getElementById('quiz-mode').classList.remove('hide');
+            
+            showQuestion();
+        }
+
+        function showQuestion() {
+            if (currentQuestionIndex >= currentQuiz.length) {
+                showResults();
+                return;
+            }
+
+            isAnswered = false;
+            const question = currentQuiz[currentQuestionIndex];
+            const container = document.getElementById('question-container');
+            
+            let html = `
+                <div class="question-card">
+                    <div class="question-number">第 ${currentQuestionIndex + 1} 題 / ${currentQuiz.length}</div>
+                    <div class="question-text">${question.question}</div>
+            `;
+
+            if (question.image) {
+                html += `<img src="${question.image}" class="question-image">`;
+            }
+
+            if (question.type === 'mc') {
+                html += '<div class="choices">';
+                question.options.forEach((option, index) => {
+                    html += `<button class="choice-btn" onclick="checkAnswer(${index})">${option}</button>`;
+                });
+                html += '</div>';
+            } else {
+                html += `
+                    <textarea id="user-answer" class="long-answer" placeholder="輸入你嘅答案..."></textarea>
+                    <button onclick="checkLongAnswer()">提交答案</button>
+                `;
+            }
+
+            html += '</div>';
+            container.innerHTML = html;
+            
+            document.getElementById('feedback-container').innerHTML = '';
+            updateScore();
+        }
+
+        function checkAnswer(selectedIndex) {
+            if (isAnswered) return;
+            isAnswered = true;
+
+            const question = currentQuiz[currentQuestionIndex];
+            const choices = document.querySelectorAll('.choice-btn');
+            
+            if (selectedIndex === question.correctAnswer) {
+                choices[selectedIndex].classList.add('correct');
+                correctSound();
+                score += 10;
+                streak++;
+                showFeedback(true);
+            } else {
+                choices[selectedIndex].classList.add('wrong');
+                choices[question.correctAnswer].classList.add('correct');
+                wrongSound();
+                streak = 0;
+                addToWrongQuestions(question);
+                showFeedback(false);
+            }
+
+            updateScore();
+        }
+
+        function checkLongAnswer() {
+            if (isAnswered) return;
+            isAnswered = true;
+
+            const question = currentQuiz[currentQuestionIndex];
+            const userAnswer = document.getElementById('user-answer').value.trim();
+            
+            if (!userAnswer) {
+                alert('請輸入答案！');
+                isAnswered = false;
+                return;
+            }
+
+            const feedback = `
+                <div class="feedback">
+                    <div><strong>你嘅答案：</strong></div>
+                    <div>${userAnswer}</div>
+                    <div style="margin-top: 20px;"><strong>參考答案：</strong></div>
+                    <div>${question.answer}</div>
+                    <div style="margin-top: 20px;">
+                        <button onclick="markCorrect()">✅ 答啱咗</button>
+                        <button class="btn-danger" onclick="markWrong()">❌ 答錯咗</button>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('feedback-container').innerHTML = feedback;
+        }
+
+        function markCorrect() {
+            correctSound();
+            score += 10;
+            streak++;
+            updateScore();
+            showFeedback(true);
+        }
+
+        function markWrong() {
+            wrongSound();
+            streak = 0;
+            const question = currentQuiz[currentQuestionIndex];
+            addToWrongQuestions(question);
+            updateScore();
+            showFeedback(false);
+        }
+
+        function showFeedback(isCorrect) {
+            const roasts = {
+                correct: [
+                    '🎉 估你唔到你都答得啱！',
+                    '✨ 好喎，繼續努力！',
+                    '💪 唔錯喎，保持落去！',
+                    '🔥 你真係有讀書喎！',
+                    '⭐ 叻仔/女！',
+                ],
+                wrong: [
+                    '💀 錯晒，返去溫書啦！',
+                    '😱 咁都錯？認真啲啦！',
+                    '🦉 我都唔知點講你好...',
+                    '⚠️ 錯到離晒譜！',
+                    '😤 你有無溫書架？',
+                ]
+            };
+
+            const messages = isCorrect ? roasts.correct : roasts.wrong;
+            const message = messages[Math.floor(Math.random() * messages.length)];
+            
+            const feedback = document.createElement('div');
+            feedback.className = `feedback ${isCorrect ? 'correct bounce' : 'wrong shake'}`;
+            feedback.textContent = message;
+            
+            document.getElementById('feedback-container').appendChild(feedback);
+        }
+
+        function addToWrongQuestions(question) {
+            if (!wrongQuestions[currentSubject]) {
+                wrongQuestions[currentSubject] = [];
+            }
+
+            const existing = wrongQuestions[currentSubject].find(q => q.id === question.id);
+            if (existing) {
+                existing.wrongCount++;
+            } else {
+                question.wrongCount = 1;
+                wrongQuestions[currentSubject].push({...question});
+            }
+
+            localStorage.setItem('wrongQuestions', JSON.stringify(wrongQuestions));
+        }
+
+        function updateScore() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('streak').textContent = streak;
+            document.getElementById('progress-text').textContent = `${currentQuestionIndex + 1}/${currentQuiz.length}`;
+            
+            const progress = ((currentQuestionIndex + 1) / currentQuiz.length) * 100;
+            document.getElementById('progress-bar').style.width = progress + '%';
+            document.getElementById('progress-bar').textContent = Math.round(progress) + '%';
+        }
+
+        function nextQuestion() {
+            if (!isAnswered && currentQuiz[currentQuestionIndex].type === 'mc') {
+                alert('揀個答案先啦！');
+                return;
+            }
+
+            currentQuestionIndex++;
+            showQuestion();
+        }
+
+        function showResults() {
+            const percentage = Math.round((score / (currentQuiz.length * 10)) * 100);
+            
+            let roast = '';
+            if (percentage >= 90) {
+                roast = '🏆 嘩，你真係有料到！繼續保持！';
+            } else if (percentage >= 70) {
+                roast = '👍 唔錯喎，但仲有進步空間！';
+            } else if (percentage >= 50) {
+                roast = '😐 一般啦，再努力啲！';
+            } else {
+                roast = '💀 你真係有溫書？快啲返去溫啦！';
+            }
+
+            const html = `
+                <h2>測驗完成！</h2>
+                <div class="final-score">${percentage}%</div>
+                <div class="roast">${roast}</div>
+                <div style="font-size: 1.2em; margin-bottom: 20px;">
+                    總分：${score} / ${currentQuiz.length * 10}<br>
+                    最長連續答啱：${streak} 題
+                </div>
+                <button onclick="quitQuiz()">返回</button>
+            `;
+
+            document.getElementById('results').innerHTML = html;
+            document.getElementById('results').classList.remove('hide');
+            document.getElementById('question-container').classList.add('hide');
+            document.getElementById('quiz-actions').classList.add('hide');
+        }
+
+        function quitQuiz() {
+            document.getElementById('quiz-select').classList.remove('hide');
+            document.getElementById('quiz-mode').classList.add('hide');
+            document.getElementById('results').classList.add('hide');
+            document.getElementById('question-container').classList.remove('hide');
+            document.getElementById('quiz-actions').classList.remove('hide');
+        }
+
+        // Flashcard Mode
+        function loadFlashcardSubjects() {
+            const container = document.getElementById('flashcard-subject-selector');
+            container.innerHTML = '';
+
+            Object.keys(quizData).forEach(subject => {
+                if (quizData[subject].length > 0) {
+                    const btn = document.createElement('button');
+                    btn.className = 'subject-btn';
+                    btn.textContent = `${subject} (${quizData[subject].length}張)`;
+                    btn.onclick = () => startFlashcard(subject);
+                    container.appendChild(btn);
+                }
+            });
+        }
+
+        let flashcardDeck = [];
+        let flashcardIndex = 0;
+        let isFlipped = false;
+
+        function startFlashcard(subject) {
+            currentSubject = subject;
+            flashcardDeck = [...quizData[subject]];
+            flashcardDeck.sort(() => Math.random() - 0.5);
+            flashcardIndex = 0;
+            isFlipped = false;
+
+            document.getElementById('flashcard-select').classList.add('hide');
+            document.getElementById('flashcard-mode').classList.remove('hide');
+            
+            showFlashcard();
+        }
+
+        function showFlashcard() {
+            if (flashcardIndex >= flashcardDeck.length) {
+                alert('✅ 完成晒所有flashcard！');
+                quitFlashcard();
+                return;
+            }
+
+            const card = flashcardDeck[flashcardIndex];
+            const flashcard = document.getElementById('flashcard');
+            const content = document.getElementById('flashcard-content');
+            
+            flashcard.classList.remove('flipped');
+            isFlipped = false;
+            
+            let html = card.question;
+            if (card.image) {
+                html = `<img src="${card.image}" style="max-width: 100%; max-height: 200px; margin-bottom: 20px;">` + html;
+            }
+            content.innerHTML = html;
+            
+            document.getElementById('flashcard-progress').textContent = `${flashcardIndex + 1}/${flashcardDeck.length}`;
+        }
+
+        function flipCard() {
+            const card = flashcardDeck[flashcardIndex];
+            const flashcard = document.getElementById('flashcard');
+            const content = document.getElementById('flashcard-content');
+            
+            flipSound();
+            
+            if (!isFlipped) {
+                flashcard.classList.add('flipped');
+                if (card.type === 'mc') {
+                    content.innerHTML = `<strong>答案：</strong>${card.options[card.correctAnswer]}`;
+                } else {
+                    content.innerHTML = `<strong>參考答案：</strong><br>${card.answer}`;
+                }
+                isFlipped = true;
+            } else {
+                flashcard.classList.remove('flipped');
+                content.innerHTML = card.question;
+                isFlipped = false;
+            }
+        }
+
+        function nextFlashcard() {
+            flashcardIndex++;
+            showFlashcard();
+        }
+
+        function quitFlashcard() {
+            document.getElementById('flashcard-select').classList.remove('hide');
+            document.getElementById('flashcard-mode').classList.add('hide');
+        }
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.code === 'Space' && !document.getElementById('flashcard-mode').classList.contains('hide')) {
+                e.preventDefault();
+                flipCard();
+            }
+        });
+
+        // Wrong Questions Review
+        function loadWrongQuestions() {
+            const container = document.getElementById('wrong-questions-list');
+            container.innerHTML = '';
+
+            let hasWrongQuestions = false;
+
+            Object.keys(wrongQuestions).forEach(subject => {
+                const questions = wrongQuestions[subject];
+                if (questions.length === 0) return;
+
+                hasWrongQuestions = true;
+
+                const section = document.createElement('div');
+                section.innerHTML = `<h3>${subject} - ${questions.length} 條錯題</h3>`;
+                
+                questions.forEach((q, index) => {
+                    const card = document.createElement('div');
+                    card.className = 'quiz-card';
+                    card.innerHTML = `
+                        <div class="quiz-info">
+                            <div><strong>Q:</strong> ${q.question}</div>
+                            <div class="quiz-meta">錯咗 ${q.wrongCount} 次</div>
+                            ${q.type === 'mc' ? `<div style="margin-top: 10px;"><strong>答案：</strong>${q.options[q.correctAnswer]}</div>` : ''}
+                        </div>
+                        <div class="quiz-actions">
+                            <button onclick="practiceWrongQuestion('${subject}', ${index})">練習</button>
+                            <button class="btn-danger" onclick="removeWrongQuestion('${subject}', ${index})">移除</button>
+                        </div>
+                    `;
+                    section.appendChild(card);
+                });
+
+                container.appendChild(section);
+            });
+
+            if (!hasWrongQuestions) {
+                container.innerHTML = '<p style="text-align: center; color: #666;">暫時無錯題，繼續努力！💪</p>';
+            }
+        }
+
+        function practiceWrongQuestion(subject, index) {
+            currentSubject = subject;
+            currentQuiz = [wrongQuestions[subject][index]];
+            currentQuestionIndex = 0;
+            score = 0;
+            streak = 0;
+
+            switchTab('quiz');
+            document.getElementById('quiz-select').classList.add('hide');
+            document.getElementById('quiz-mode').classList.remove('hide');
+            showQuestion();
+        }
+
+        function removeWrongQuestion(subject, index) {
+            if (confirm('確定要移除呢條錯題？')) {
+                wrongQuestions[subject].splice(index, 1);
+                if (wrongQuestions[subject].length === 0) {
+                    delete wrongQuestions[subject];
+                }
+                localStorage.setItem('wrongQuestions', JSON.stringify(wrongQuestions));
+                loadWrongQuestions();
+            }
+        }
+
+        // Initialize on load
+        init();
+    </script>
+</body>
+</html>
+
