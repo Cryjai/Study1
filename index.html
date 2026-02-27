@@ -471,6 +471,12 @@
 
         <!-- 管理題庫 -->
         <div id="manage-tab" class="tab-content active">
+            <div style="margin-bottom: 20px; text-align: center; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+                <button onclick="exportData()" style="background: #28a745;">💾 Export 備份</button>
+                <button onclick="document.getElementById('import-file').click()" style="background: #17a2b8;">📂 Import 匯入</button>
+                <input type="file" id="import-file" accept=".json" onchange="importData(event)" style="display: none;">
+            </div>
+
             <div class="subject-selector" id="subject-selector">
                 <button class="subject-btn" onclick="selectSubject('Econ')">📊 經濟 Econ</button>
                 <button class="subject-btn" onclick="selectSubject('Eng')">🇬🇧 英文 English</button>
@@ -1281,9 +1287,114 @@
             }
         }
 
+        // Export / Import Functions
+        function exportData() {
+            const data = {
+                quizData: quizData,
+                wrongQuestions: wrongQuestions,
+                exportDate: new Date().toISOString(),
+                version: '1.0'
+            };
+
+            const dataStr = JSON.stringify(data, null, 2);
+            const dataBlob = new Blob([dataStr], { type: 'application/json' });
+            
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `DSE-Quiz-Backup-${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+
+            alert('✅ 備份成功！記得keep好個file！');
+        }
+
+        function importData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    
+                    if (!data.quizData) {
+                        alert('❌ 呢個唔係有效嘅backup file！');
+                        return;
+                    }
+
+                    const confirmMsg = '⚠️ Import會覆蓋現有data！\n\n你而家有：\n' + 
+                        Object.keys(quizData).map(s => `${s}: ${quizData[s].length}題`).join('\n') +
+                        '\n\n確定要覆蓋？';
+
+                    if (Object.keys(quizData).length > 0 && !confirm(confirmMsg)) {
+                        return;
+                    }
+
+                    // Merge or replace
+                    const mergeChoice = confirm('撳「確定」= 合併data（保留舊+新）\n撳「取消」= 完全覆蓋（刪晒舊data）');
+                    
+                    if (mergeChoice) {
+                        // Merge mode
+                        Object.keys(data.quizData).forEach(subject => {
+                            if (!quizData[subject]) {
+                                quizData[subject] = [];
+                            }
+                            data.quizData[subject].forEach(q => {
+                                // Check for duplicates by question text
+                                const exists = quizData[subject].find(existing => 
+                                    existing.question === q.question
+                                );
+                                if (!exists) {
+                                    quizData[subject].push(q);
+                                }
+                            });
+                        });
+
+                        if (data.wrongQuestions) {
+                            Object.keys(data.wrongQuestions).forEach(subject => {
+                                if (!wrongQuestions[subject]) {
+                                    wrongQuestions[subject] = [];
+                                }
+                                data.wrongQuestions[subject].forEach(q => {
+                                    const exists = wrongQuestions[subject].find(existing => 
+                                        existing.id === q.id
+                                    );
+                                    if (!exists) {
+                                        wrongQuestions[subject].push(q);
+                                    }
+                                });
+                            });
+                        }
+                    } else {
+                        // Replace mode
+                        quizData = data.quizData;
+                        wrongQuestions = data.wrongQuestions || {};
+                    }
+
+                    localStorage.setItem('quizData', JSON.stringify(quizData));
+                    localStorage.setItem('wrongQuestions', JSON.stringify(wrongQuestions));
+                    
+                    loadQuizList();
+                    
+                    const totalQuestions = Object.values(quizData).reduce((sum, arr) => sum + arr.length, 0);
+                    alert(`✅ Import成功！\n\n總共：${totalQuestions}條題目\n科目：${Object.keys(quizData).length}個`);
+                    
+                } catch (error) {
+                    alert('❌ Import失敗！File可能損壞。\n\nError: ' + error.message);
+                }
+            };
+            
+            reader.readAsText(file);
+            
+            // Reset file input
+            event.target.value = '';
+        }
+
         // Initialize on load
         init();
     </script>
 </body>
 </html>
-
