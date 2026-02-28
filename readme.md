@@ -7,3 +7,4 @@
 - [x] 上傳圖片（題目/選項都可以有圖）  
 - [x] 自定flash card with sound effect  
 - [x] Backup data (export and import json file) Very convenient 
+Try here https://cryjai.github.io/Study1/
