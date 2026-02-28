@@ -1,0 +1,9 @@
+- [x] 快速建立quiz set（space = 新題，space = 新option）  
+- [x] Multiple choice + Long question  
+- [x] 計分系統 毒舌鼓勵  
+- [x] 錯題自動loop（呢個最重要）  
+- [x] Sound effects (答啱/答錯)  
+- [x] Local storage save quiz sets  
+- [x] 上傳圖片（題目/選項都可以有圖）  
+- [x] 自定flash card with sound effect  
+- [x] Backup data (export and import json file) Very convenient 
